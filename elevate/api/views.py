@@ -1,4 +1,3 @@
-from django.shortcuts import render
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -6,7 +5,7 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 from .models import Product
-from .serializers import productSerializer
+from .serializers import ProductSerializer
 
 
 # Create your views here.
@@ -16,10 +15,10 @@ from .serializers import productSerializer
 def product_list(request):
     if request.method == 'GET':
         products = Product.objects.all()
-        serializer = productSerializer(products, many=True)
+        serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
     if request.method == 'POST':
-        serializer = productSerializer(data=request.data)
+        serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -27,18 +26,18 @@ def product_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def product(request, productId):
+def product(request, product_id):
     if request.method == 'GET':
-        product = get_object_or_404(Product, id=productId)
-        serializer = productSerializer(product)
+        product = get_object_or_404(Product, id=product_id)
+        serializer = ProductSerializer(product)
         return Response(serializer.data)
     if request.method == 'DELETE':
-        get_object_or_404(Product, id=productId).delete()
+        get_object_or_404(Product, id=product_id).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     if request.method == 'PUT':
-        product = get_object_or_404(Product, id=productId)
+        product = get_object_or_404(Product, id=product_id)
 
-        serializer = productSerializer(product, data=request.data)
+        serializer = ProductSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
