@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 from .models import Product
@@ -21,11 +21,9 @@ def product_list(request):
     if request.method == 'POST':
         serializer=productSerializer(data=request.data)
         if serializer.is_valid():
-
             serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors,status=HTTP_400_BAD_REQUEST)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','PUT','DELETE'])
 def product(request,productId):
@@ -34,14 +32,14 @@ def product(request,productId):
         serializer=productSerializer(product)
         return Response(serializer.data) 
     if request.method == 'DELETE':
-        count=get_object_or_404(Product,id=productId).delete()
-        return Response({'deleted':count[0]})
+        get_object_or_404(Product,id=productId).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     if request.method == 'PUT':
         product=get_object_or_404(Product,id=productId)
         
         serializer=productSerializer(product,data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors,status=HTTP_400_BAD_REQUEST)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
